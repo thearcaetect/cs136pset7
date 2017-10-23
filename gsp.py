@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import random
-
+#test
 class GSP:
     """
     Implements the generalized second price auction mechanism.
