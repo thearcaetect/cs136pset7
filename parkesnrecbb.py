@@ -3,6 +3,7 @@
 import sys
 
 from gsp import GSP
+import math
 from util import argmax_index
 
 class Parkesnrecbb:
@@ -50,9 +51,15 @@ class Parkesnrecbb:
         returns a list of utilities per slot.
         """
         # TODO: Fill this in
-        utilities = []   # Change this
-
-        
+        info = self.slot_info(t, history, reserve)
+        # CHECK: DO WE NEED THIS??
+        # c_1 = round(30 * math.cos(math.pi * t / 24) + 50)
+        utilities = []
+        for j in range(len(info)):
+            c_j = 0.75 ** j
+            v_i = self.value
+            t_j = info[j][1]
+            utilities.append(c_j * (v_i - t_j))
         return utilities
 
     def target_slot(self, t, history, reserve):
@@ -63,7 +70,7 @@ class Parkesnrecbb:
         the other-agent bid for that slot in the last round.  If slot_id = 0,
         max_bid is min_bid * 2
         """
-        i =  argmax_index(self.expected_utils(t, history, reserve))
+        i = argmax_index(self.expected_utils(t, history, reserve))
         info = self.slot_info(t, history, reserve)
         return info[i]
 
@@ -80,10 +87,12 @@ class Parkesnrecbb:
 
         prev_round = history.round(t-1)
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
-
+        if min_bid > self.value or slot == 0:
+            bid = self.value
+        # QUESTION: is t_j same as min_bid?????
+        else:
+            bid = self.value - 0.75 * (self.value - min_bid)
         # TODO: Fill this in.
-        bid = 0  # change this
-        
         return bid
 
     def __repr__(self):
