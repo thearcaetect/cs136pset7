@@ -41,6 +41,10 @@ class VCG:
             return ([], [])
         
         (allocation, just_bids) = zip(*allocated_bids)
+        print(valid_bids)
+        print(allocated_bids)
+        print(allocation)
+        print(just_bids)
 
         # TODO: You just have to implement this function
         def total_payment(k):
@@ -49,7 +53,9 @@ class VCG:
             """
             c = slot_clicks
             n = len(allocation)
-            if k >= n-1:
+            if k >= n:
+                return 0
+            elif k == n-1:
                 if len(valid_bids) > len(allocated_bids):
                     return c[k] * valid_bids[n][1]
                 else:
@@ -64,11 +70,12 @@ class VCG:
         def norm(totals):
             """Normalize total payments by the clicks in each slot"""
             return map(lambda (x,y): x/y, zip(totals, slot_clicks))
-        print(slot_clicks)
+        #print(slot_clicks)
         print(total_payment(0))
+        print(total_payment(1))
         per_click_payments = norm(
             [total_payment(k) for k in range(len(allocation))])
-        
+        print(per_click_payments)
         return (list(allocation), per_click_payments)
 
     @staticmethod
