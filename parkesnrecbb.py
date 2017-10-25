@@ -52,14 +52,15 @@ class Parkesnrecbb:
         """
         # TODO: Fill this in
         info = self.slot_info(t, history, reserve)
+        num_clicks = (history.round(t-1)).clicks
+        # print info
         # CHECK: DO WE NEED THIS??
         # c_1 = round(30 * math.cos(math.pi * t / 24) + 50)
         utilities = []
         for j in range(len(info)):
-            c_j = 0.75 ** j
             v_i = self.value
             t_j = info[j][1]
-            utilities.append(c_j * (v_i - t_j))
+            utilities.append(num_clicks[j] * (v_i - t_j))
         return utilities
 
     def target_slot(self, t, history, reserve):
@@ -91,7 +92,9 @@ class Parkesnrecbb:
             bid = self.value
         # QUESTION: is t_j same as min_bid?????
         else:
-            bid = self.value - 0.75 * (self.value - min_bid)
+            num_clicks = (history.round(t-1)).clicks
+            ctr_ratio = float(num_clicks[slot]) / float(num_clicks[slot - 1])
+            bid = self.value - ctr_ratio * (self.value - min_bid)
         # TODO: Fill this in.
         return bid
 
