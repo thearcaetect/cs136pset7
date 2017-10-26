@@ -77,6 +77,11 @@ class Parkesnrecbudget:
 
 
     def linear_scale(self, val, bottom_val=100, top_val=175, top_scale=0.5):
+        # val is the agent's current value
+        # bottom val is the lower bound where we do not scale the bid
+        # top val is the highest possible value
+        # top scale is the value we scale the bid down by if the agent's value
+        # is the maximum value
         pct_range = (float(val) - bottom_val) / (top_val - bottom_val)
         # print val
         # print pct_range
