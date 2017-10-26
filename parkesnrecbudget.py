@@ -3,6 +3,7 @@
 import sys
 
 from gsp import GSP
+import math
 from util import argmax_index
 
 class Parkesnrecbudget:
@@ -50,9 +51,16 @@ class Parkesnrecbudget:
         returns a list of utilities per slot.
         """
         # TODO: Fill this in
-        utilities = []   # Change this
-
-        
+        info = self.slot_info(t, history, reserve)
+        num_clicks = (history.round(t-1)).clicks
+        # print info
+        # CHECK: DO WE NEED THIS??
+        # c_1 = round(30 * math.cos(math.pi * t / 24) + 50)
+        utilities = []
+        for j in range(len(info)):
+            v_i = self.value
+            t_j = info[j][1]
+            utilities.append(num_clicks[j] * (v_i - t_j))
         return utilities
 
     def target_slot(self, t, history, reserve):
@@ -63,9 +71,17 @@ class Parkesnrecbudget:
         the other-agent bid for that slot in the last round.  If slot_id = 0,
         max_bid is min_bid * 2
         """
-        i =  argmax_index(self.expected_utils(t, history, reserve))
+        i = argmax_index(self.expected_utils(t, history, reserve))
         info = self.slot_info(t, history, reserve)
         return info[i]
+
+
+    def linear_scale(self, val, bottom_val=100, top_val=175, top_scale=0.5):
+        pct_range = (float(val) - bottom_val) / (top_val - bottom_val)
+        # print val
+        # print pct_range
+        # print 1.0 - (top_scale * pct_range)
+        return (1.0 - (top_scale * pct_range))
 
     def bid(self, t, history, reserve):
         # The Balanced bidding strategy (BB) is the strategy for a player j that, given
@@ -80,11 +96,23 @@ class Parkesnrecbudget:
 
         prev_round = history.round(t-1)
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
+        if min_bid > self.value or slot == 0:
+            bid = self.value
+        # QUESTION: is t_j same as min_bid?????
+        else:
+            num_clicks = (history.round(t-1)).clicks
+            ctr_ratio = float(num_clicks[slot]) / float(num_clicks[slot - 1])
+            bid = self.value - ctr_ratio * (self.value - min_bid)
 
-        # TODO: Fill this in.
-        bid = 0  # change this
-        
-        return bid
+        lower_scale_bound = 130
+        # print 'VALL'
+        # print self.value
+        # print 'KANYE'
+        if self.value >= lower_scale_bound:
+            return bid * self.linear_scale(self.value, bottom_val=lower_scale_bound)
+        else:
+            return bid
+
 
     def __repr__(self):
         return "%s(id=%d, value=%d)" % (
